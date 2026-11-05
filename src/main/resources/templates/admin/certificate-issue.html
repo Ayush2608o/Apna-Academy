@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Generate certificate | Apna Academy</title>
+  <link rel="stylesheet" th:href="@{/css/site.css}">
+</head>
+<body class="dashboard-body">
+<header th:replace="~{fragments/nav :: nav}"></header>
+<main class="page-wrap narrow">
+  <a class="text-link" th:href="@{/admin}">← Admin dashboard</a>
+  <span class="eyebrow">CERTIFICATE ISSUANCE</span>
+  <h1>Generate certificate</h1>
+  <p class="lead">Choose a student with an assigned course. A unique certificate number and QR code will be created.</p>
+  <div class="content-panel">
+    <div class="empty-state" th:if="${#lists.isEmpty(students)}">No students with an assigned course are available yet. Assign a course to a student before issuing a certificate.</div>
+    <form th:unless="${#lists.isEmpty(students)}" class="form-card" method="post" th:action="@{/admin/manage/certificates/issue}">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+      <label>Student
+        <select name="studentId" required>
+          <option value="" selected disabled>Choose a student</option>
+          <option th:each="student : ${students}" th:value="${student['id']}" th:text="${student['name'] + ' — ' + student['course_name']}"></option>
+        </select>
+      </label>
+      <button class="button button-primary" type="submit">Generate certificate</button>
+    </form>
+  </div>
+  <a class="button button-quiet" th:href="@{/admin/manage/certificates}">Manage certificates</a>
+</main>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

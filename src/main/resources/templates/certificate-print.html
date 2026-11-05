@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Certificate | Apna Academy</title>
+  <link rel="stylesheet" th:href="@{/css/site.css}">
+</head>
+<body>
+<header th:replace="~{fragments/nav :: nav}"></header>
+<main class="page-wrap narrow">
+  <article class="content-panel certificate-print">
+    <div class="alert success" th:if="${success}" th:text="${success}"></div>
+    <span class="eyebrow">APNA ACADEMY</span>
+    <h1>Certificate of Completion</h1>
+    <p class="lead">This certificate is awarded to</p>
+    <h2 th:text="${certificate['student_name']}">Student</h2>
+    <p>for completing <strong th:text="${certificate['course_name']}">Course</strong></p>
+    <p>Certificate number: <strong th:text="${certificate['certificate_number']}"></strong></p>
+    <p>Issue date: <span th:text="${certificate['issue_date']}"></span></p>
+    <p>Status: <strong th:text="${certificate['status']}"></strong></p>
+    <img class="certificate-qr" th:src="@{/certificate/{number}/qr.png(number=${certificate['certificate_number']})}" alt="Scan to verify this certificate">
+    <p class="muted">Scan this QR code with a phone camera to verify this certificate.</p>
+    <a class="button button-primary" href="javascript:window.print()">Print certificate</a>
+    <a class="button button-quiet" th:href="@{/certificate/verify(certificateNumber=${certificate['certificate_number']})}">Verify online</a>
+  </article>
+</main>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

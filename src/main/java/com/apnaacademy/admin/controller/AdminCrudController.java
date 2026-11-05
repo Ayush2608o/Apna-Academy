@@ -1,6 +1,7 @@
 package com.apnaacademy.admin.controller;
 
 import com.apnaacademy.service.AdminTableService;
+import com.apnaacademy.service.AcademyDataService;
 import java.util.Map;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
@@ -15,7 +16,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class AdminCrudController {
     private final AdminTableService tables;
-    public AdminCrudController(AdminTableService tables) { this.tables = tables; }
+    private final AcademyDataService data;
+
+    public AdminCrudController(AdminTableService tables, AcademyDataService data) {
+        this.tables = tables;
+        this.data = data;
+    }
 
     @GetMapping("/admin/manage/{module}")
     public String list(@PathVariable String module, Model model) {
@@ -24,7 +30,31 @@ public class AdminCrudController {
         model.addAttribute("title", tables.title(module));
         model.addAttribute("columns", tables.columns(table));
         model.addAttribute("rows", tables.rows(table));
+        if (module.equals("certificates")) {
+            model.addAttribute("students", data.certificateStudents());
+        }
         return "admin/table";
+    }
+
+    @GetMapping("/admin/certificates/issue")
+    public String issueCertificateForm(Model model) {
+        model.addAttribute("students", data.certificateStudents());
+        return "admin/certificate-issue";
+    }
+
+    @PostMapping("/admin/manage/certificates/issue")
+    public String issueCertificate(@RequestParam long studentId, RedirectAttributes redirect) {
+        try {
+            String certificateNumber = data.issueCertificate(studentId);
+            redirect.addFlashAttribute("success", "Certificate generated: " + certificateNumber);
+            return "redirect:/certificate/" + certificateNumber;
+        } catch (IllegalArgumentException ex) {
+            redirect.addFlashAttribute("error", ex.getMessage());
+        } catch (DataAccessException ex) {
+            redirect.addFlashAttribute("error",
+                    "Certificate could not be generated. Check the student record and assigned course.");
+        }
+        return "redirect:/admin/manage/certificates";
     }
 
     @PostMapping("/admin/manage/{module}/create")

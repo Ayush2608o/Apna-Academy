@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,14 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AcademyDataService {
     private static final Set<String> PUBLIC_TABLES = Set.of("courses", "faculty", "events", "jobs", "placements", "notes", "tests");
     private final JdbcTemplate jdbc;
-    private final String certificateSchema;
 
-    public AcademyDataService(JdbcTemplate jdbc,
-                              @Value("${academy.certificate-schema:certificate_system}") String certificateSchema) {
-        this.jdbc = jdbc;
-        if (!certificateSchema.matches("[A-Za-z0-9_]+")) throw new IllegalArgumentException("Invalid certificate schema name");
-        this.certificateSchema = certificateSchema;
-    }
+    public AcademyDataService(JdbcTemplate jdbc) { this.jdbc = jdbc; }
 
     public List<Map<String, Object>> list(String table) {
         requirePublicTable(table);
@@ -49,13 +42,46 @@ public class AcademyDataService {
         if (!PUBLIC_TABLES.contains(table)) throw new IllegalArgumentException("Unsupported content table");
     }
 
-    public List<Map<String, Object>> verifyCertificate(String certificateId) {
-        return jdbc.queryForList("SELECT certificate_id, student_name, course_name, issue_date, issuer_name, status " +
-                "FROM `" + certificateSchema + "`.certificates WHERE certificate_id = ?", certificateId);
+    public List<Map<String, Object>> verifyCertificate(String certificateNumber) {
+        return jdbc.queryForList("SELECT cert.certificate_number, s.name AS student_name, " +
+                "c.course_name, cert.issue_date, cert.status " +
+                "FROM certificates cert " +
+                "JOIN students s ON s.id = cert.student_id " +
+                "LEFT JOIN courses c ON c.id = cert.course_id " +
+                "WHERE cert.certificate_number = ?", certificateNumber);
     }
 
     public boolean hasCertificates() {
-        return jdbc.queryForObject("SELECT COUNT(*) FROM `" + certificateSchema + "`.certificates", Long.class) > 0;
+        return jdbc.queryForObject("SELECT COUNT(*) FROM certificates", Long.class) > 0;
+    }
+
+    public Map<String, Object> certificate(String certificateNumber) {
+        return jdbc.queryForMap("SELECT cert.certificate_number, s.name AS student_name, c.course_name, " +
+                "cert.issue_date, cert.status " +
+                "FROM certificates cert " +
+                "JOIN students s ON s.id = cert.student_id " +
+                "LEFT JOIN courses c ON c.id = cert.course_id " +
+                "WHERE cert.certificate_number = ?", certificateNumber);
+    }
+
+    public List<Map<String, Object>> certificateStudents() {
+        return jdbc.queryForList("SELECT s.id, s.name, s.email, c.course_name " +
+                "FROM students s JOIN courses c ON c.id = s.course_id ORDER BY s.name");
+    }
+
+    @Transactional
+    public String issueCertificate(long studentId) {
+        Long courseId = jdbc.queryForObject("SELECT course_id FROM students WHERE id = ?", Long.class, studentId);
+        if (courseId == null) {
+            throw new IllegalArgumentException("Assign a course to this student before issuing a certificate.");
+        }
+
+        String certificateNumber = "APNA-" + java.time.Year.now().getValue() + "-" +
+                java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase(java.util.Locale.ROOT);
+        jdbc.update("INSERT INTO certificates (student_id, course_id, certificate_number, issue_date, status) " +
+                        "VALUES (?, ?, ?, CURRENT_DATE(), 'ISSUED')",
+                studentId, courseId, certificateNumber);
+        return certificateNumber;
     }
 
     @Transactional

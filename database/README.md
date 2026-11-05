@@ -1,8 +1,8 @@
 # Existing database inspection
 
-The Java application connects to `apna_academy` on local MySQL port 3306. A structure-only export is saved as `apna_academy_schema.sql`; it has no records and excludes DROP statements. The verified schema has 15 tables with the columns and relationships in that file. No schema or record changes were made for this migration.
+The Java application connects to the configured MySQL database using `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. A structure-only export is saved as `apna_academy_schema.sql`; it has no records and excludes DROP statements. The verified schema has 15 tables with the columns and relationships in that file.
 
-Certificate verification reads from the separate `certificate_system.certificates` table. The app performs a read-only lookup by `certificate_id`; the MySQL account needs `SELECT` permission on that schema. Certificate data is not copied into `apna_academy`.
+Certificates are stored in the same database's `certificates` table. Its identifier column is `certificate_number`; lookups join `students` and `courses` for display names. Certificate QR codes link to the public verification page.
 
 ## Run the read-only inspection
 
@@ -26,4 +26,4 @@ mysqldump --host=localhost --port=3306 --user=root --no-data --no-create-db --sk
 
 The PHP source/assets are still needed to copy the original pages and behavior. The structure export is for reference only; do not apply it as a migration.
 
-Latest read-only counts for public content: 5 courses, 4 faculty, 4 events, 1 placement, 1 job, 7 notes, and 0 certificates. No records were added by the app. The schema has no separate `admissions` table; admissions are represented in `students`, and test questions are in `test_questions`.
+The checked-in export is schema-only and contains no application records. The schema has no separate `admissions` table; admissions are represented in `students`, and test questions are in `test_questions`.

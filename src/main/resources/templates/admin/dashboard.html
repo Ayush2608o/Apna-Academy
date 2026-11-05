@@ -1,1 +1,27 @@
-<!doctype html><html lang="en" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin dashboard | Apna Academy</title><link rel="stylesheet" th:href="@{/css/site.css}"></head><body class="dashboard-body"><header th:replace="~{fragments/nav :: nav}"></header><main class="page-wrap"><div class="section-heading"><div><span class="eyebrow">ADMINISTRATION</span><h1>Dashboard</h1><p class="lead">Manage academy information and student services.</p></div><div><a class="button button-quiet" th:href="@{/admin/profile}">Admin profile</a><form method="post" th:action="@{/logout}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="button button-quiet" type="submit">Sign out</button></form></div></div><div class="stats-strip stats-dashboard"><div th:each="stat : ${stats}" class="stat"><strong th:text="${stat.value}">0</strong><span th:text="${stat.label}">Students</span></div></div><section class="section"><div class="section-heading"><div><span class="eyebrow">RECORD MANAGEMENT</span><h2>Academy modules</h2></div></div><div class="admin-module-grid"><a class="module-card" th:each="module : ${ {'students':'Student Management','admissions':'Admissions','courses':'Courses','faculty':'Faculty','fees':'Fees','attendance':'Attendance','enquiries':'Enquiries','placements':'Placements','jobs':'Job openings','events':'Events','certificates':'Certificates','notes':'Study notes','tests':'Online tests','questions':'Test questions','test-results':'Test results'} }" th:href="@{/admin/manage/{key}(key=${module.key})}"><span th:text="${module.value}">Module</span><b>→</b></a></div></section></main><footer th:replace="~{fragments/footer :: footer}"></footer></body></html>
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin dashboard | Apna Academy</title>
+  <link rel="stylesheet" th:href="@{/css/site.css}">
+</head>
+<body class="dashboard-body">
+<header th:replace="~{fragments/nav :: nav}"></header>
+<main class="page-wrap">
+  <div class="section-heading">
+    <div><span class="eyebrow">ADMINISTRATION</span><h1>Dashboard</h1><p class="lead">Manage academy information and student services.</p></div>
+    <div><a class="button button-quiet" th:href="@{/admin/profile}">Admin profile</a><form method="post" th:action="@{/logout}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="button button-quiet" type="submit">Sign out</button></form></div>
+  </div>
+  <div class="stats-strip stats-dashboard"><div th:each="stat : ${stats}" class="stat"><strong th:text="${stat.value}">0</strong><span th:text="${stat.label}">Students</span></div></div>
+  <section class="section">
+    <div class="section-heading">
+      <div><span class="eyebrow">RECORD MANAGEMENT</span><h2>Academy modules</h2></div>
+      <a class="button button-primary" th:href="@{/admin/certificates/issue}">Generate certificate</a>
+    </div>
+    <div class="admin-module-grid"><a class="module-card" th:each="module : ${ {'students':'Student Management','admissions':'Admissions','courses':'Courses','faculty':'Faculty','fees':'Fees','attendance':'Attendance','enquiries':'Enquiries','placements':'Placements','jobs':'Job openings','events':'Events','certificates':'Certificates','notes':'Study notes','tests':'Online tests','questions':'Test questions','test-results':'Test results'} }" th:href="@{/admin/manage/{key}(key=${module.key})}"><span th:text="${module.value}">Module</span><b>→</b></a></div>
+  </section>
+</main>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

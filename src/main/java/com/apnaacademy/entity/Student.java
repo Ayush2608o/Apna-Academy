@@ -22,7 +22,7 @@ public class Student {
     @Column(length = 20) private String phone;
     @Column(length = 20) private String gender;
     private LocalDate dob;
-    private String address;
+    @Column(columnDefinition = "text") private String address;
     @Column(name = "admission_date") private LocalDate admissionDate;
     @Column(length = 30) private String status = "ACTIVE";
     @Column(name = "created_at") private LocalDateTime createdAt;
