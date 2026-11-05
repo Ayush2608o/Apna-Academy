@@ -10,7 +10,7 @@ This workspace contains a Java 21 Spring Boot application backed by the MySQL sc
 
 ## Database setup
 
-Set `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` in your shell or IDE run configuration. `DB_URL` must be a JDBC URL for a reachable MySQL 8 database, such as `jdbc:mysql://localhost:3306/apna_academy?serverTimezone=UTC` for local development. Certificate records use the same `apna_academy.certificates` table and the schema's actual `certificate_number` column.
+Set `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` in your shell or IDE run configuration. `DB_URL` must be a JDBC URL for a reachable MySQL 8 database, such as `jdbc:mysql://localhost:3306/apna_academy?serverTimezone=UTC` for local development. Certificate verification reads existing records from `certificate_system.certificates` by default (`CERTIFICATE_SCHEMA` can override the schema), then checks certificates issued in `apna_academy.certificates`.
 
 The app uses `spring.jpa.hibernate.ddl-auto=validate`. Startup validates mapped tables and columns; it does not create, drop, or alter schema objects. The structure-only export at `database/apna_academy_schema.sql` contains no records and excludes DROP statements. Import the schema and your own application records into the hosted database before deploying; the schema file by itself produces an empty website.
 

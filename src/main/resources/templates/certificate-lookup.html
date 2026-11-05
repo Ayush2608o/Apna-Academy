@@ -11,7 +11,7 @@
 <main class="page-wrap narrow">
   <span class="eyebrow">CREDENTIAL CHECK</span>
   <h1>Verify a certificate</h1>
-  <p class="lead">Enter the exact certificate number from the <code>certificate_number</code> column in the academy database. You can also scan a certificate QR code to verify it instantly.</p>
+  <p class="lead">Enter the certificate ID from the certificate database, or scan its QR code to verify it instantly.</p>
   <form class="form-card form-inline" method="post" th:action="@{/certificate/verify}">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
     <label>Certificate number
@@ -21,7 +21,7 @@
   </form>
   <div th:if="${matches != null}" class="content-panel">
     <div th:if="${unavailable}" class="alert error">No certificate records are registered in the connected certificate database yet.</div>
-    <div th:if="${!unavailable and #lists.isEmpty(matches)}" class="alert error">No certificate matched that value. Check it against the exact <code>certificate_number</code> field in MySQL Workbench.</div>
+    <div th:if="${!unavailable and #lists.isEmpty(matches)}" class="alert error">No certificate matched that ID. Check that it matches the certificate ID saved in MySQL Workbench.</div>
     <article th:each="item : ${matches}">
       <span class="eyebrow">CERTIFICATE RECORD</span>
       <h2 th:text="${item['student_name']}">Student</h2>

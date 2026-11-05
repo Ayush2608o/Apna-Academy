@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AcademyDataService {
     private static final Set<String> PUBLIC_TABLES = Set.of("courses", "faculty", "events", "jobs", "placements", "notes", "tests");
     private final JdbcTemplate jdbc;
+    @Value("${academy.certificate-schema:certificate_system}")
+    private String certificateSchema = "certificate_system";
 
     public AcademyDataService(JdbcTemplate jdbc) { this.jdbc = jdbc; }
 
@@ -43,6 +46,12 @@ public class AcademyDataService {
     }
 
     public List<Map<String, Object>> verifyCertificate(String certificateNumber) {
+        List<Map<String, Object>> registered = jdbc.queryForList("SELECT cert.certificate_id AS certificate_number, " +
+                "cert.student_name, cert.course_name, cert.issue_date, cert.status " +
+                "FROM " + certificateSchemaTable() + " cert " +
+                "WHERE cert.certificate_id = ?", certificateNumber);
+        if (!registered.isEmpty()) return registered;
+
         return jdbc.queryForList("SELECT cert.certificate_number, s.name AS student_name, " +
                 "c.course_name, cert.issue_date, cert.status " +
                 "FROM certificates cert " +
@@ -52,16 +61,31 @@ public class AcademyDataService {
     }
 
     public boolean hasCertificates() {
-        return jdbc.queryForObject("SELECT COUNT(*) FROM certificates", Long.class) > 0;
+        Long registered = jdbc.queryForObject("SELECT COUNT(*) FROM " + certificateSchemaTable(), Long.class);
+        Long issued = jdbc.queryForObject("SELECT COUNT(*) FROM certificates", Long.class);
+        return (registered != null && registered > 0) || (issued != null && issued > 0);
     }
 
     public Map<String, Object> certificate(String certificateNumber) {
+        List<Map<String, Object>> registered = jdbc.queryForList("SELECT cert.certificate_id AS certificate_number, " +
+                "cert.student_name, cert.course_name, cert.issue_date, cert.status " +
+                "FROM " + certificateSchemaTable() + " cert " +
+                "WHERE cert.certificate_id = ?", certificateNumber);
+        if (!registered.isEmpty()) return registered.get(0);
+
         return jdbc.queryForMap("SELECT cert.certificate_number, s.name AS student_name, c.course_name, " +
                 "cert.issue_date, cert.status " +
                 "FROM certificates cert " +
                 "JOIN students s ON s.id = cert.student_id " +
                 "LEFT JOIN courses c ON c.id = cert.course_id " +
                 "WHERE cert.certificate_number = ?", certificateNumber);
+    }
+
+    private String certificateSchemaTable() {
+        if (certificateSchema == null || !certificateSchema.matches("[A-Za-z0-9_]+")) {
+            throw new IllegalStateException("Invalid certificate database schema name");
+        }
+        return "`" + certificateSchema + "`.certificates";
     }
 
     public List<Map<String, Object>> certificateStudents() {

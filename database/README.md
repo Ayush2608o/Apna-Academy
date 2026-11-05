@@ -2,7 +2,7 @@
 
 The Java application connects to the configured MySQL database using `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. A structure-only export is saved as `apna_academy_schema.sql`; it has no records and excludes DROP statements. The verified schema has 15 tables with the columns and relationships in that file.
 
-Certificates are stored in the same database's `certificates` table. Its identifier column is `certificate_number`; lookups join `students` and `courses` for display names. Certificate QR codes link to the public verification page.
+Existing certificates are stored in the separate `certificate_system.certificates` table. Its identifier column is `certificate_id`, and student/course display names are stored directly in that table. Set `CERTIFICATE_SCHEMA` to use a different schema. Certificates issued by the academy admin are stored in `apna_academy.certificates` and use `certificate_number`; verification checks both sources. Certificate QR codes link to the public verification page.
 
 ## Run the read-only inspection
 
