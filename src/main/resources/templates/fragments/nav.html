@@ -1,0 +1,15 @@
+<nav class="topbar" th:fragment="nav">
+  <div class="nav-inner">
+    <a class="brand" th:href="@{/}"><span class="brand-mark">A</span><span>Apna Academy<small>Learn. Build. Grow.</small></span></a>
+    <button class="menu-toggle" type="button" onclick="document.body.classList.toggle('menu-open')" aria-label="Toggle navigation">☰</button>
+    <div class="nav-links">
+      <a th:href="@{/courses}">Courses</a><a th:href="@{/faculty}">Faculty</a><a th:href="@{/events}">Events</a>
+      <a th:href="@{/placements}">Placements</a><a th:href="@{/jobs}">Jobs</a><a th:href="@{/notes}">Notes</a>
+      <a th:href="@{/certificate/verify}">Verify certificate</a>
+    </div>
+    <div class="nav-actions">
+      <a class="button button-quiet" th:href="@{/login}">Sign in</a>
+      <a class="button button-primary" th:href="@{/register}">Join now</a>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,6 @@
+<footer class="footer" th:fragment="footer">
+  <div class="footer-inner"><div><a class="brand brand-light" th:href="@{/}"><span class="brand-mark">A</span><span>Apna Academy<small>Learning for what comes next.</small></span></a></div>
+    <div class="footer-links"><a th:href="@{/about}">About</a><a th:href="@{/contact}">Contact</a><a th:href="@{/courses}">Courses</a></div>
+    <p>© <span th:text="${#dates.year(#dates.createNow())}">2026</span> Apna Academy</p>
+  </div>
+</footer>

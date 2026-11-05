@@ -1,0 +1,9 @@
+[build]
+  command = "mkdir -p public && test -n \"$BACKEND_URL\" && sed -i \"s|BACKEND_URL_PLACEHOLDER|${BACKEND_URL}|g\" netlify.toml"
+  publish = "public"
+
+[[redirects]]
+  from = "/*"
+  to = "BACKEND_URL_PLACEHOLDER/:splat"
+  status = 200
+  force = true
